@@ -1,36 +1,16 @@
-import { useEffect, useState } from "react";
 import Shimmer from "./ShimmerUI";
 import { NavLink } from "react-router-dom";
 import { CDN_URL } from "../utils/constants";
 import RestaurantMenueCard from "./RestaurantMenueCard";
 import { MENUE_URL } from "../utils/constants";
 import { useParams } from "react-router-dom";
-
+import useRestaurantMenu from "../utils/useRestaurantMenu";
 
 function RestaurantMenue() {
-  const [resInfo, setResInfo] = useState(null);
-  const {resId}=useParams()
-
-  useEffect(() => {
-    fetchData();
-  }, []);
-
-  const fetchData = async () => {
-    try {
-      const data = await fetch(
-       `${MENUE_URL+resId}` 
-      );
-      const json = await data.json();
-      console.log("Swiggy Menu JSON:", json);
-      setResInfo(json);
-      console.log(resInfo);
-    } catch (error) {
-      console.error("Error fetching menu:", error);
-    }
-  };
+  const {resId}=useParams();
+  const resInfo=useRestaurantMenu(resId);
 
   if (resInfo === null) return <Shimmer />;
-
   const {
     name,
     city,
@@ -44,8 +24,12 @@ function RestaurantMenue() {
   const { cards } =
     resInfo?.data?.cards[5]?.groupedCard?.cardGroupMap?.REGULAR || {};
 
+  // const itemCategory=resInfo?.data?.card[5]?.groupedCard?.cardGroupMap?.REGULAR?.cards.filter((c)=>c.card?.card?.["@type"]=== "type.googleapis.com/swiggy.presentation.food.v2.ItemCategory")
+
   return (
+   
     <>
+    {     console.log(resInfo.data)}
       <div className="pt-5 pl-96 pr-96">
         <div className="p-3 ">
           <NavLink to="/">Home</NavLink>/{city}/{name}{" "}
@@ -69,8 +53,7 @@ function RestaurantMenue() {
           {cards.map((cards) => {
             return <RestaurantMenueCard key={id} cards={cards} />;
           })}
-          </div>
-        
+          </div>       
       </div>
     </>
   );

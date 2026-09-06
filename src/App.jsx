@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { Suspense, useState,lazy } from "react";
 import reactLogo from "./assets/react.svg";
 import viteLogo from "./assets/vite.svg";
 import heroImg from "./assets/hero.png";
@@ -10,6 +10,8 @@ import About from "./components/About";
 import ContactUs from "./components/ContactUs";
 import Error from "./components/Error";
 import RestaurantMenue from "./components/RestaurantMenu";
+
+const Grocery=lazy(()=>import("./components/Grocery"))
 
 function AppLayout() {
   return (
@@ -41,6 +43,10 @@ function App(props) {
         {
           path:"/restaurant-menue/:resId",
           element:<RestaurantMenue/>
+        },
+        {
+          path:"/grocery",
+          element:<Suspense fallback={<h1>loading....</h1>}><Grocery/></Suspense>
         }
       ],
       errorElement: <Error />,

@@ -1,16 +1,18 @@
 import React, { useEffect, useState } from "react";
-import ResCard from "./ResCard";
+import ResCard,{withDiscount} from "./ResCard";
 import Shimmer from "./ShimmerUI";
 import { NavLink } from "react-router-dom";
+import useOnlineStatus from "../utils/useOnlineStatus";
+  const ResWithDiscount=withDiscount(ResCard) 
 
 function Body() {
   const [listRes, setListRes] = useState([]);
   const [searchText, setSearchText] = useState("");
   const [searchList, setSearchList] = useState([]);
-
   const [nextOffSet, setNextOffSet] = useState("");
   const [widgetOffset, setWidgetOffset] = useState({});
   const [isFetchingMore, setFetchingMore] = useState(false);
+  const onlineStatus=useOnlineStatus();
 
   const filteredlist = () => {
     const filterRes = listRes.filter((res) => {
@@ -30,9 +32,6 @@ function Body() {
     );
 
     const json = await data.json();
-
-    console.log(json.data.cards[1].card.card.gridElements.infoWithStyle);
-
     const restaurants =
       json?.data?.cards[1]?.card?.card?.gridElements?.infoWithStyle
         ?.restaurants ||
@@ -72,6 +71,8 @@ function Body() {
           ?.restaurants ||
         json?.data?.cards[0]?.card?.card?.gridElements?.infoWithStyle
           ?.restaurants;
+
+         
 
       const newOffset =
         json?.data?.pageOffset?.nextOffset || json?.data?.nextOffset;
@@ -115,34 +116,42 @@ function Body() {
     console.log("after", searchText);
   };
 
+  if(onlineStatus===false) return(
+      <h1>Lookes like you are offline, please connct to internet </h1>
+    )
+  
   return listRes.length === 0 ? (
     <Shimmer />
   ) : (
-    <>
+   <div className="px-40">
       <div>
         <input
-          className="border p-1 m-2"
+          className="border border-amber-500 p-1 m-2 shadow-lg shadow-neutral-400 rounded-lg"
           placeholder="Search"
           value={searchText}
           onChange={(e) => setSearchText(e.target.value)}
         ></input>
         <button
-          className="border shadow-lg bg-gray-50  p-1 m-2 rounded-lg cursor-pointer"
+          className="border border-amber-500 shadow-lg hover:bg-amber-300 shadow-neutral-400 p-1 m-2 rounded-lg cursor-pointer"
           onClick={handleSearch}
         >
           search
         </button>
 
         <button
-          className="border shadow-lg bg-gray-50  p-1 m-2 rounded-lg cursor-pointer"
+          className="border shadow-lg border-amber-500 hover:bg-amber-300 shadow-neutral-400  p-1 m-2 rounded-lg cursor-pointer"
           onClick={filteredlist}
         >
           Top Rated
         </button>
       </div>
-      <div className="flex flex-wrap items-stretch ">
+      <div className="flex flex-wrap pt-5">
         {searchList.map((res, idx) => {
-          return <NavLink key={`${res?.info?.id}-${idx}`} to={"/restaurant-menue/"+res?.info?.id}> <ResCard key={`${res?.info?.id}-${idx}`} resList={res} /></NavLink>;
+          return <NavLink key={`${res?.info?.id}-${idx}`} to={"/restaurant-menue/"+res?.info?.id}>
+            {res?.info?.aggregatedDiscountInfoV3 ?(<ResWithDiscount key={`${res?.info?.id}-${idx}`} resList={res}/>):
+             (<ResCard key={`${res?.info?.id}-${idx}`} resList={res} />)
+            }
+             </NavLink>;
         })}
       </div>
       {isFetchingMore && (
@@ -150,7 +159,7 @@ function Body() {
           Loading more restaurants...
         </div>
       )}
-    </>
+ </div>
   );
 }
 

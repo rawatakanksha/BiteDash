@@ -7,7 +7,9 @@ function RestaurantMenueCard({ cards }) {
   const itemCards = cards?.card?.card?.itemCards || [];
 
   return (
+   
     <div className="mb-6">
+    
    { (title)?
   ( <div className="flex justify-between">
     <h2 className="text-2xl font-bold  p-4 text-gray-800">{title}</h2>
@@ -20,7 +22,6 @@ function RestaurantMenueCard({ cards }) {
         {itemCards.map((item) => {
           const { id, name, imageId, price, defaultPrice, description } =
             item?.card?.info || {};
-
           return (
             <div
               key={id}
