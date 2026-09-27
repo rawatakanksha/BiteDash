@@ -5,10 +5,12 @@ import RestaurantMenueCard from "./RestaurantMenueCard";
 import { MENUE_URL } from "../utils/constants";
 import { useParams } from "react-router-dom";
 import useRestaurantMenu from "../utils/useRestaurantMenu";
+import { useState } from "react";
 
 function RestaurantMenue() {
-  const {resId}=useParams();
-  const resInfo=useRestaurantMenu(resId);
+  const { resId } = useParams();
+  const resInfo = useRestaurantMenu(resId);
+  const [showIndex,setShowIndex]=useState(1)
 
   if (resInfo === null) return <Shimmer />;
   const {
@@ -19,20 +21,22 @@ function RestaurantMenue() {
     totalRatingsString,
     costForTwoMessage,
     cuisines,
-    id
+    id,
   } = resInfo?.data?.cards[2]?.card?.card?.info;
-  const { cards } =
-    resInfo?.data?.cards[5]?.groupedCard?.cardGroupMap?.REGULAR || {};
-
-  // const itemCategory=resInfo?.data?.card[5]?.groupedCard?.cardGroupMap?.REGULAR?.cards.filter((c)=>c.card?.card?.["@type"]=== "type.googleapis.com/swiggy.presentation.food.v2.ItemCategory")
+  
+   const groupedCardObject = resInfo?.data?.cards?.find(
+    (c) => c?.groupedCard
+  );
+ const cards =
+    groupedCardObject?.groupedCard?.cardGroupMap?.REGULAR?.cards || [];
 
   return (
-   
     <>
-    {     console.log(resInfo.data)}
+      {console.log(resInfo.data,"resssinfo")}
+      {console.log(cards)}
       <div className="pt-5 pl-96 pr-96">
-        <div className="p-3 ">
-          <NavLink to="/">Home</NavLink>/{city}/{name}{" "}
+        <div className="p-3 text-gray-500 text-xs font-semibold">
+          <NavLink  to="/"><span className="hover:text-black">Home</span></NavLink> / {city} /<span className="text-black"> {name}</span>
         </div>
         <div className="text-3xl font-bold p-3">{name}</div>
         <div className="w-full p-3 flex h-96 overflow-hidden">
@@ -49,11 +53,11 @@ function RestaurantMenue() {
         </div>
         <div className="text-amber-600 font-bold">{cuisines.join(",")}</div>
 
-       <div>
-          {cards.map((cards) => {
-            return <RestaurantMenueCard key={id} cards={cards} />;
+        <div>
+          {cards.map((cards,idx) => {
+            return <RestaurantMenueCard showItem={idx===showIndex} setShowIndex={()=>setShowIndex(idx===showIndex?null:idx)} key={cards?.card?.card?.title || idx} cards={cards} />;
           })}
-          </div>       
+        </div>
       </div>
     </>
   );

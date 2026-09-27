@@ -1,5 +1,6 @@
 import React from "react";
 import User from "./User";
+import UserContext from "../utils/UserContext";
 
 class About extends React.Component{
     constructor(props){
@@ -25,11 +26,12 @@ class About extends React.Component{
     render(){
           console.log("parent render lifecycle")
         return(
-            <div>              
+            <div>     
+                   <div>LoggedIn User:
+                    <UserContext.Consumer>
+                    {({loggedInUser})=> loggedInUser}
+                    </UserContext.Consumer></div>      
                 <User name={"akanksha"} age={24} child={"A"}/>
-                <User name={"HARSH"} age={24} child={"B"}/>
-                <User name={"aka"} age={24} child={"C"}/>
-
             </div>
         )
     }

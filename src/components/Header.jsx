@@ -1,11 +1,19 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import logo from "../assets/cat-image.png";
 import { NavLink } from "react-router-dom";
 import useOnlineStatus from "../utils/useOnlineStatus";
+import UserContext from "../utils/UserContext";
+import { useSelector } from "react-redux";
+
 
 function Header() {
-  const [loginBtn,setLoginBtn]=useState('Login')
+  const [loginBtn,setLoginBtn]=useState('Login');
   const onlineStatus=useOnlineStatus();
+  const {loggedInUser}=useContext(UserContext);
+
+  // subscribing to store
+  const cartItems=useSelector((store)=>store.cart.items);
+
   const handleLogin=()=>{
     if(loginBtn==="Login"){
       return setLoginBtn("Logout")
@@ -32,8 +40,10 @@ function Header() {
             </li>
             <li className="cursor-pointer">   <NavLink to='/contact' className={({isActive})=>isActive?'text-amber-500':''}>Contact Us</NavLink></li>
             <li className="cursor-pointer">   <NavLink to='/grocery' className={({isActive})=>isActive?'text-amber-500':''}>Grocery</NavLink></li>
-            <li className="cursor-pointer" >Cart</li>
+            <li className="cursor-pointer" >  <NavLink to='/cart' className={({isActive})=>isActive?'text-amber-500':''}>Cart({cartItems.length})</NavLink></li>
+            <li>{loggedInUser}</li>
             <li className="cursor-pointer"><button onClick={handleLogin}>{loginBtn}</button></li>
+            
           </ul>
         </div>
       </div>

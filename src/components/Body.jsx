@@ -1,9 +1,11 @@
-import React, { useEffect, useState } from "react";
-import ResCard,{withDiscount} from "./ResCard";
+import React, { useEffect, useState,useContext } from "react";
+import ResCard, { WithDiscount } from "./ResCard";
 import Shimmer from "./ShimmerUI";
 import { NavLink } from "react-router-dom";
 import useOnlineStatus from "../utils/useOnlineStatus";
-  const ResWithDiscount=withDiscount(ResCard) 
+import UserContext from "../utils/UserContext";
+const ResCardWithDisCount=WithDiscount(ResCard)
+
 
 function Body() {
   const [listRes, setListRes] = useState([]);
@@ -12,7 +14,8 @@ function Body() {
   const [nextOffSet, setNextOffSet] = useState("");
   const [widgetOffset, setWidgetOffset] = useState({});
   const [isFetchingMore, setFetchingMore] = useState(false);
-  const onlineStatus=useOnlineStatus();
+  const onlineStatus = useOnlineStatus();
+  const {setUserName,loggedInUser}=useContext(UserContext)
 
   const filteredlist = () => {
     const filterRes = listRes.filter((res) => {
@@ -72,8 +75,6 @@ function Body() {
         json?.data?.cards[0]?.card?.card?.gridElements?.infoWithStyle
           ?.restaurants;
 
-         
-
       const newOffset =
         json?.data?.pageOffset?.nextOffset || json?.data?.nextOffset;
 
@@ -116,20 +117,25 @@ function Body() {
     console.log("after", searchText);
   };
 
-  if(onlineStatus===false) return(
-      <h1>Lookes like you are offline, please connct to internet </h1>
-    )
-  
+  if (onlineStatus === false)
+    return <h1>Lookes like you are offline, please connct to internet </h1>;
+
   return listRes.length === 0 ? (
     <Shimmer />
   ) : (
-   <div className="px-40">
+    <div className="px-40">
       <div>
         <input
           className="border border-amber-500 p-1 m-2 shadow-lg shadow-neutral-400 rounded-lg"
           placeholder="Search"
           value={searchText}
           onChange={(e) => setSearchText(e.target.value)}
+        ></input>
+        <input
+          className="border border-amber-500 p-1 m-2 shadow-lg shadow-neutral-400 rounded-lg"
+          placeholder="User Name"
+          value={loggedInUser}
+          onChange={(e) => setUserName(e.target.value)}
         ></input>
         <button
           className="border border-amber-500 shadow-lg hover:bg-amber-300 shadow-neutral-400 p-1 m-2 rounded-lg cursor-pointer"
@@ -147,11 +153,21 @@ function Body() {
       </div>
       <div className="flex flex-wrap pt-5">
         {searchList.map((res, idx) => {
-          return <NavLink key={`${res?.info?.id}-${idx}`} to={"/restaurant-menue/"+res?.info?.id}>
-            {res?.info?.aggregatedDiscountInfoV3 ?(<ResWithDiscount key={`${res?.info?.id}-${idx}`} resList={res}/>):
-             (<ResCard key={`${res?.info?.id}-${idx}`} resList={res} />)
-            }
-             </NavLink>;
+          return (
+            <NavLink
+              key={`${res?.info?.id}-${idx}`}
+              to={"/restaurant-menue/" + res?.info?.id}
+            >
+              {res?.info?.aggregatedDiscountInfoV3.header ? (
+                <ResCardWithDisCount
+                  key={`${res?.info?.id}-${idx}`}
+                  resList={res}
+                />
+              ) : (
+                <ResCard key={`${res?.info?.id}-${idx}`} resList={res} />
+              )}
+            </NavLink>
+          );
         })}
       </div>
       {isFetchingMore && (
@@ -159,7 +175,7 @@ function Body() {
           Loading more restaurants...
         </div>
       )}
- </div>
+    </div>
   );
 }
 

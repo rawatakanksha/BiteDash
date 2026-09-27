@@ -24,7 +24,7 @@ class User extends React.Component {
   render() {
     const { name, location, avatar_url } = this.state.userInfo;
     return (
-      <div className="border-2 border-b-gray-500">
+      <div className="">
         <h1>Name:{name}</h1>
         <h2>Location:{location || "NA"}</h2>
         <img src={avatar_url}></img>
